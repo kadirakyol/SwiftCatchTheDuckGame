@@ -14,6 +14,7 @@ class ViewController: UIViewController {
     var hideTimer = Timer()
     var counter = 0
     var duckArray = [UIImageView]()
+    var highScore = 0
     
     // Views
     @IBOutlet weak var timeLabel: UILabel!
@@ -34,6 +35,20 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        // Highscore Check
+        
+        let storedHighscore = UserDefaults.standard.object(forKey: "highscore") // key'e dikkat
+        if storedHighscore == nil {
+            highScore = 0
+            highScoreLabel.text = "Highscore: \(highScore)"
+        }
+        
+        if let newScore = storedHighscore as? Int {
+            highScore = newScore
+            highScoreLabel.text = "Highscore: \(highScore)"
+        }
+        
         
         scoreLabel.text = "Score: \(score)"
         
@@ -113,6 +128,16 @@ class ViewController: UIViewController {
             for duck in duckArray {
                 duck.isHidden = true
             }
+            // highscore
+            
+            if self.score > self.highScore {
+                self.highScore = self.score
+                highScoreLabel.text = "Highscore: \(self.highScore)"
+                UserDefaults.standard.set(self.highScore, forKey: "highscore") // key'e dikkat
+                
+            }
+            
+            
             
             // Alert
             
@@ -120,6 +145,16 @@ class ViewController: UIViewController {
             let okButton = UIAlertAction(title: "OK", style: UIAlertAction.Style.cancel, handler: nil)
             let replayButton = UIAlertAction(title: "Replay", style: UIAlertAction.Style.default) { UIAlertAction in
                 // Replay Function
+                self.score = 0
+                self.scoreLabel.text = "Score: \(self.score)"
+                self.counter = 10
+                self.timeLabel.text = "\(self.counter)" // String(self.counter)
+                
+                self.timer = Timer.scheduledTimer(timeInterval: 1, target: self, selector: #selector(self.countDown), userInfo: nil, repeats: true)
+                self.hideTimer = Timer.scheduledTimer(timeInterval: 0.5, target: self, selector: #selector(self.hideDuck), userInfo: nil, repeats: true)
+                
+                
+                
             }
             
             alert.addAction(replayButton)
